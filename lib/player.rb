@@ -15,23 +15,38 @@ class Player
   private
 
   def prompt_name
-    puts 'Enter Name: '
-    gets.chomp
+    loop do
+      puts 'Enter Name: '
+
+      name = gets.chomp
+
+      if name.empty?
+        puts 'Invalid name, please enter something'
+        next
+      end
+
+      return name
+    end
   end
 
   def prompt_code
-    puts 'Enter your code [a-z, 0-9]: '
-    code = gets.chomp
+    loop do
+      puts 'Enter a 4-character code (a–z, 0–9): '
+      code = gets.chomp
 
-    is_valid = valid_code?(code)
+      is_valid = valid_code?(code)
 
-    return unless is_valid
+      unless is_valid
+        puts 'Invalid code. It must be exactly 4 characters and contain only a–z or 0–9'
+        next
+      end
 
-    code
+      return code
+    end
   end
 
   def valid_code?(code)
-    return false if code.length > 4
+    return false unless code.length == 4
 
     code.chars.each do |c|
       next if (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
