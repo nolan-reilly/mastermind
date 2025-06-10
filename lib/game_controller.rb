@@ -1,5 +1,6 @@
 require_relative './player'
 require_relative './computer'
+require 'colorize'
 
 # TODO: Work on player guessing loop
 # TODO: Add a computer turn with randomized guesses
@@ -16,20 +17,54 @@ class GameController
     puts "\nWelcome to Mastermind!"
     puts '-------------------------'
 
+    puts "Computer Code: #{@computer.code}"
+
+    player_won = false
+
     round = 0
-    until round == 12
+    until round == 12 || player_won
       code = prompt_code
 
-      evalute_guess(code)
+      puts(print_guess(code))
+
+      guess = evaluate_guess(code)
+
+      player_won = true if guess
 
       round += 1
+    end
+
+    if player_won
+      puts 'You Won!'
+    else
+      puts "You lost, you didn't guess the code in time..."
     end
   end
 
   private
 
+  def print_guess(code)
+    output = []
+
+    4.times do |i|
+      # If the guess is included and the correct position
+      if code[i] == @computer.code[i]
+        output.push(code[i].colorize(:green))
+        next
+      elsif @computer.code.include? code[i] # If the guess is included but not the same position
+        output.push(code[i].colorize(:yellow))
+      else
+        output.push(code[i])
+      end
+    end
+
+    output.join(' ')
+  end
+
   def evaluate_guess(code)
-    # TODO: Work on game logic for checking player guess
+    return true if code == @computer.code
+
+    false
   end
 
   def prompt_code
@@ -61,5 +96,5 @@ class GameController
   end
 end
 
-# game = GameController.new
-# game.start
+game = GameController.new
+game.start
