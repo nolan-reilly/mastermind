@@ -2,8 +2,11 @@ require_relative './player'
 require_relative './computer'
 require 'colorize'
 
-# TODO: Work on player guessing loop
 # TODO: Add a computer turn with randomized guesses
+
+# TODO: Fix computer guesses colors to not use player guess, possibly add another function variable to switch
+#       between computer and player
+
 # TODO: There are repeated functions in game_controller and player maybe fix this
 
 # Controls the General flow of the Mastermind game
@@ -20,16 +23,23 @@ class GameController
     puts "Computer Code: #{@computer.code}"
 
     player_won = false
+    computer_won = false
 
     round = 0
-    until round == 12 || player_won
-      code = prompt_code
+    until round == 12 || player_won || computer_won
+      guess = prompt_code
 
-      puts(print_guess(code))
+      puts "\nPlayer Guess: #{print_guess(guess)}"
 
-      guess = evaluate_guess(code)
+      correct_guess = evaluate_guess(guess)
 
-      player_won = true if guess
+      player_won = true if correct_guess
+
+      computer_guess = [*'a'..'z', *'0'..'9'].sample(4).join
+      puts "\nComputer Guess: #{print_guess(computer_guess)}"
+      computer_guess_correct = evaluate_guess(computer_guess)
+
+      computer_won = true if computer_guess_correct
 
       round += 1
     end
@@ -61,6 +71,10 @@ class GameController
     output.join(' ')
   end
 
+  def computer_guess
+    print_guess(guess)
+  end
+
   def evaluate_guess(code)
     return true if code == @computer.code
 
@@ -69,7 +83,7 @@ class GameController
 
   def prompt_code
     loop do
-      puts 'Enter a 4-character code (a–z, 0–9): '
+      puts "\nEnter a 4-character code (a–z, 0–9): "
       code = gets.chomp
 
       is_valid = valid_code?(code)
