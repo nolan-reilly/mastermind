@@ -1,4 +1,5 @@
 require_relative './player'
+require_relative './computer'
 
 # TODO: Work on player guessing loop
 # TODO: Add a computer turn with randomized guesses
@@ -8,6 +9,7 @@ require_relative './player'
 class GameController
   def initialize
     @player = Player.new
+    @computer = Computer.new
   end
 
   def start
@@ -17,6 +19,8 @@ class GameController
     round = 0
     until round == 12
       code = prompt_code
+
+      evalute_guess(code)
 
       round += 1
     end
@@ -57,5 +61,5 @@ class GameController
   end
 end
 
-game = GameController.new
-game.start
+# game = GameController.new
+# game.start
