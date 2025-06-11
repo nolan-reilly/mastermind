@@ -2,11 +2,6 @@ require_relative './player'
 require_relative './computer'
 require 'colorize'
 
-# TODO: Add a computer turn with randomized guesses
-
-# TODO: Fix computer guesses colors to not use player guess, possibly add another function variable to switch
-#       between computer and player
-
 # TODO: There are repeated functions in game_controller and player maybe fix this
 
 # Controls the General flow of the Mastermind game
@@ -16,17 +11,21 @@ class GameController
     @computer = Computer.new
   end
 
+  # FIXME: Function is too long
   def start
     puts "\nWelcome to Mastermind!"
     puts '-------------------------'
 
-    puts "Computer Code: #{@computer.code}"
+    # For testing purposes only
+    # puts "Computer Code: #{@computer.code}"
 
     player_won = false
     computer_won = false
 
     round = 0
     until round == 12 || player_won || computer_won
+      puts "Guesses Left: #{12 - round}"
+
       guess = prompt_code
 
       puts "\nPlayer Guess: #{print_guess(guess)}"
@@ -36,8 +35,8 @@ class GameController
       player_won = true if correct_guess
 
       computer_guess = [*'a'..'z', *'0'..'9'].sample(4).join
-      puts "\nComputer Guess: #{print_guess(computer_guess)}"
-      computer_guess_correct = evaluate_guess(computer_guess)
+      puts "\nComputer Guess: #{computer_print_guess(computer_guess)}"
+      computer_guess_correct = computer_evaluate_guess(computer_guess)
 
       computer_won = true if computer_guess_correct
 
@@ -53,6 +52,10 @@ class GameController
 
   private
 
+  # FIXME: Currently have two similar functions for player and computer guessing
+  #        and printing, and could possibly combine them
+
+  # Player evaluates computer
   def print_guess(code)
     output = []
 
@@ -71,12 +74,33 @@ class GameController
     output.join(' ')
   end
 
-  def computer_guess
-    print_guess(guess)
-  end
-
   def evaluate_guess(code)
     return true if code == @computer.code
+
+    false
+  end
+
+  def computer_print_guess(code)
+    output = []
+
+    4.times do |i|
+      # If the guess is included and the correct position
+      if code[i] == @player.code[i]
+        output.push(code[i].colorize(:green))
+        next
+      elsif @player.code.include? code[i] # If the guess is included but not the same position
+        output.push(code[i].colorize(:yellow))
+      else
+        output.push(code[i])
+      end
+    end
+
+    output.join(' ')
+  end
+
+  # Computer Evaluates
+  def computer_evaluate_guess(code)
+    return true if code == @player.code
 
     false
   end
@@ -109,6 +133,3 @@ class GameController
     true
   end
 end
-
-game = GameController.new
-game.start
